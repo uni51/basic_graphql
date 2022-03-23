@@ -5,27 +5,22 @@ const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 
 // GraphQL スキーマ言語を記述してスキーマを構築する
+// スキーマに引数を指定している
 const schema = buildSchema(`
   type Query {
-    quoteOfTheDay: String
-    random: Float!
-    rollThreeDice: [Int]
+    rollDice(numDice: Int!, numSides: Int): [Int]
   }
 `);
 
 // リゾルバ関数
 const root = {
-  // スキーマで定義した「quoteOfTheDay: String」のデータ操作
-  quoteOfTheDay: () => {
-    return Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within';
-  },
-  // スキーマで定義した「random: Float!」のデータ操作
-  random: () => {
-    return Math.random();
-  },
-  // スキーマで定義した「rollThreeDice: [Int]」のデータ操作
-  rollThreeDice: () => {
-    return [1, 2, 3].map((_) => 1 + Math.floor(Math.random() * 6));
+  // クライアント側のクエリから引数の値を受け取る
+  rollDice: ({numDice, numSides}) => {
+    let output = [];
+    for (var i = 0; i < numDice; i++) {
+      output.push(1 + Math.floor(Math.random() * (numSides || 6)));
+    }
+    return output;
   },
 };
 
